@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract Frontend</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Storage Smart Contract</h1>
+
+    <div>
+        <label for="storeValue">Enter a value to store:</label>
+        <input type="number" id="storeValue">
+        <button onclick="storeValue()">Store Value</button>
+    </div>
+
+    <div>
+        <button onclick="viewMoney()">View Stored Value</button>
+        <p id="storedValue">Stored Value: N/A</p>
+    </div>
+    <form action="/main" method="post">
+        <p><input type="submit" value="Main"></p>
+    </form>
+    <form action="/" method="post">
+        <p><input type="submit" value="Login page"></p>
+    </form>
+    <script>
+        const contractAddress = "0x1d4f421D347B04B136d8ef9312109C2b45Ae98b1"; // Replace with your contract's address
+        const contractABI = [
+            {
+                "constant": false,
+                "inputs": [
+                    {  
+                        "name": "num",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "store",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "view_money",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        window.addEventListener('load', function() {
+            if (typeof window.ethereum !== 'undefined') {
+                window.web3 = new Web3(window.ethereum);
+                window.ethereum.enable();
+            } else {
+                console.warn("No Ethereum provider detected. Install MetaMask.");
+            }
+        });
+
+        const storeValue = async () => {
+            const value = document.getElementById('storeValue').value;
+            const accounts = await web3.eth.getAccounts();
+            const storageContract = new web3.eth.Contract(contractABI, contractAddress);
+
+            storageContract.methods.store(value).send({ from: accounts[0] })
+                .on('receipt', function(receipt) {
+                    alert('Value stored successfully');
+                });
+        };
+
+        const viewMoney = async () => {
+            const storageContract = new web3.eth.Contract(contractABI, contractAddress);
+
+            const storedValue = await storageContract.methods.view_money().call();
+            document.getElementById('storedValue').innerText = 'Stored Value: ' + storedValue;
+        };
+    </script>
+</body>
+</html>
