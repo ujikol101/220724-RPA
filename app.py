@@ -1,9 +1,7 @@
 from flask import Flask,render_template,request
 import google.generativeai as palm
-import os
 
-api = os.getenv("MAKERSUITE_API_TOKEN")
-palm.configure(api_key=api)#google api设置
+palm.configure(api_key="AIzaSyDyFBJKUtHaoz2vF1tQBz_PJgx_2kbadhw")#google api设置
 model = {"model":"models/chat-bison-001"} #model选择
 
 
@@ -22,7 +20,9 @@ def main():
 def genAI():
     q = request.form.get("q")
     r = palm.chat(**model,messages=q)
-    
     return(render_template("genAI.html",r=r.last))
+@app.route("/DApp",methods=["GET","POST"])
+def DApp():
+    return(render_template("DApp.html"))
 if __name__ == "__main__":
     app.run()
